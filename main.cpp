@@ -5,6 +5,7 @@
 #include <queue>
 #include "drawable.h" 
 #include <ctime>
+#include <math.h>
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define SCREEN_FPS 60;
@@ -44,6 +45,15 @@ for(int i = 0; i< drawq.size(); i++){
   SDL_RenderPresent(renderer);
 
 }
+void updateAnimation(Drawable* obj, Uint32 currentTime){
+float diff = (currentTime-obj->getUpdate())/1000.0f;
+   int frames = floor(diff/(1.0f/16.0f));
+   if(frames > 0){
+     obj->setStage(obj->getStage()+frames);
+     obj->setTime(currentTime);
+   }
+   
+}
 
 
 int main(int argc, char* args[]) {
@@ -63,11 +73,10 @@ int main(int argc, char* args[]) {
   drawq.push(player);
   draw(drawq,window,renderer);
   SDL_Event event;
-  Uint32 time = SDL_GetTicks()/1000;
+  player->lastupdate = SDL_GetTicks();
 while(true){
 while (SDL_PollEvent(&event))
 {
-  player->animationstage+=.5;
 
 	if(event.type == SDL_KEYDOWN)
 	{
@@ -113,6 +122,12 @@ while (SDL_PollEvent(&event))
 
     }
 	}
+   Uint32 current = SDL_GetTicks();
+   updateAnimation(player,current);
+   drawq.push(player);
+   draw(drawq,window,renderer);
+  
+   
 }
 
  
